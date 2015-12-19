@@ -2,17 +2,19 @@
 import time
 import datetime
 import pytz
+import numpy
 import random
 import gzip
+import zipfile
 import sys
 import argparse
 from faker import Faker
 from random import randrange
 
 #todo:
-# - generate Gaussian distribution of responses and verbs
-# - allow writing different patterns (Common Log, Custom log, error log etc)
-# - log rotation
+# allow writing different patterns (Common Log, Apache Error log etc)
+# log rotation
+
 
 class switch(object):
     def __init__(self, value):
@@ -35,9 +37,9 @@ class switch(object):
             return False
 
 parser = argparse.ArgumentParser(__file__, description="Fake Apache Log Generator")
-parser.add_argument("--output", "-o", dest='output_type', help="Output [.Log File,.gz File,Console]", choices=['LOG','GZ','CONSOLE'] )
-parser.add_argument("--num", "-n", dest='num_lines', help="Number of lines to generate", type=int, default=1)
-parser.add_argument("--prefix", "-p", dest='file_prefix', help="File Prefix", type=str)
+parser.add_argument("--output", "-o", dest='output_type', help="Write to a Log file, a gzip file or to STDOUT", choices=['LOG','GZ','CONSOLE'] )
+parser.add_argument("--num", "-n", dest='num_lines', help="Number of lines to generate (0 for infinite)", type=int, default=1)
+parser.add_argument("--prefix", "-p", dest='file_prefix', help="Prefix the output file name", type=str)
 
 args = parser.parse_args()
 
@@ -69,23 +71,27 @@ verb=["GET","POST","DELETE","PUT"]
 
 resources=["/list","/wp-content","/wp-admin","/explore","/search/tag/list","/app/main/posts","/posts/posts/explore","/apps/cart.jsp?appID="]
 
-ualist = [faker.firefox, faker.opera, faker.internet_explorer, faker.chrome, faker.safari]
+ualist = [faker.firefox, faker.chrome, faker.safari, faker.internet_explorer, faker.opera]
 
-for i in xrange(0,log_lines):
+flag = True
+while (flag):
 	increment = datetime.timedelta(seconds=random.randint(30,300))
 	otime += increment
 
 	ip = faker.ipv4()
 	dt = otime.strftime('%d/%b/%Y:%H:%M:%S')
 	tz = datetime.datetime.now(pytz.timezone('US/Pacific')).strftime('%z')
-	vrb = random.choice(verb)
+	vrb = numpy.random.choice(verb,p=[0.6,0.1,0.1,0.2])
 
 	uri = random.choice(resources)
 	if uri.find("apps")>0:
 		uri += `random.randint(1000,10000)`
 
-	resp = random.choice(response)
-	byt = random.randint(1000,10000)
+	resp = numpy.random.choice(response,p=[0.9,0.04,0.02,0.04])
+	byt = int(random.gauss(5000,50))
 	referer = faker.uri()
-	useragent = random.choice(ualist)()
+	useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
 	f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s "%s" "%s"\n' % (ip,dt,tz,vrb,uri,resp,byt,referer,useragent))
+
+	log_lines = log_lines - 1
+	flag = False if log_lines == 0 else True
