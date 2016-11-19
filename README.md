@@ -57,7 +57,7 @@ optional arguments:
 
 ## Requirements
 * Python 2.7
-* ```pip install fake-factory numpy ```
+* ```pip install -r requirements.txt```
 
 ## License
 This script is released under the [Apache version 2](LICENSE) license.
