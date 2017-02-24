@@ -41,6 +41,7 @@ Detailed help
 $ python apache-fake-log-gen.py -h
 usage: apache-fake-log-gen.py [-h] [--output {LOG,GZ,CONSOLE}]
                               [--num NUM_LINES] [--prefix FILE_PREFIX]
+                              [--sleep SLEEP]
 
 Fake Apache Log Generator
 
@@ -52,6 +53,8 @@ optional arguments:
                         Number of lines to generate (0 for infinite)
   --prefix FILE_PREFIX, -p FILE_PREFIX
                         Prefix the output file name
+  --sleep SLEEP, -s SLEEP
+                        Sleep this long between lines (in seconds)
 ```
 
 
