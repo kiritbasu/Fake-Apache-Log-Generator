@@ -91,7 +91,7 @@ while (flag):
 
 	uri = random.choice(resources)
 	if uri.find("apps")>0:
-		uri += `random.randint(1000,10000)`
+		uri += random.randint(1000,10000)
 
 	resp = numpy.random.choice(response,p=[0.9,0.04,0.02,0.04])
 	byt = int(random.gauss(5000,50))
