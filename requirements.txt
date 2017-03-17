@@ -2,3 +2,4 @@ fake-factory==0.7.2
 numpy==1.11.2
 Faker==0.7.3
 pytz==2016.7
+tzlocal==1.3.0
