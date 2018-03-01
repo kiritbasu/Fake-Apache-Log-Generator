@@ -17,7 +17,7 @@ $ python apache-fake-log-gen.py
 
 Generate 100 log lines into a .log file
 ```
-$ python apache-fake-log-gen.py -n 100 -o LOG 
+$ python apache-fake-log-gen.py -n 100 -o LOG
 ```
 
 Generate 100 log lines into a .gz file at intervals of 10 seconds
@@ -27,10 +27,10 @@ $ python apache-fake-log-gen.py -n 100 -o GZ -s 10
 
 Infinite log file generation (useful for testing File Tail Readers)
 ```
-$ python apache-fake-log-gen.py -n 0 -o LOG 
+$ python apache-fake-log-gen.py -n 0 -o LOG
 ```
 
-Prefix the output filename 
+Prefix the output filename
 ```
 $ python apache-fake-log-gen.py -n 100 -o LOG -p WEB1
 ```
@@ -61,6 +61,17 @@ optional arguments:
 ## Requirements
 * Python 2.7
 * ```pip install -r requirements.txt```
+
+## Docker Usage
+
+```
+docker run -it kununu/Fake-Apache-Log-Generator
+```
+
+Environment variables:
+
+* NUM_LINES number of lines to print before terminate (default: 0 - infinite)
+* DELAY_SECONDS delay between lines (default: 1.0 seconds)
 
 ## License
 This script is released under the [Apache version 2](LICENSE) license.
