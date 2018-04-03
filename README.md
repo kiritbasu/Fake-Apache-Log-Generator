@@ -20,6 +20,11 @@ Generate 100 log lines into a .log file
 $ python apache-fake-log-gen.py -n 100 -o LOG 
 ```
 
+Generate a 100KB .log file
+```
+$ python apache-fake-log-gen.py -n 0 --size 100 -o LOG 
+```
+
 Generate 100 log lines into a .gz file at intervals of 10 seconds
 ```
 $ python apache-fake-log-gen.py -n 100 -o GZ -s 10
