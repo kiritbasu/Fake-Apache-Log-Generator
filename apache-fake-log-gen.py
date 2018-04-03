@@ -44,6 +44,7 @@ parser.add_argument("--log-format", "-l", dest='log_format', help="Log format, C
 parser.add_argument("--num", "-n", dest='num_lines', help="Number of lines to generate (0 for infinite)", type=int, default=1)
 parser.add_argument("--prefix", "-p", dest='file_prefix', help="Prefix the output file name", type=str)
 parser.add_argument("--sleep", "-s", help="Sleep this long between lines (in seconds)", default=0.0, type=float)
+parser.add_argument("--size", dest='size', help="Desired size of the generated log in KB", type=int)
 
 args = parser.parse_args()
 
@@ -51,6 +52,7 @@ log_lines = args.num_lines
 file_prefix = args.file_prefix
 output_type = args.output_type
 log_format = args.log_format
+size = args.size * 1000
 
 faker = Faker()
 
@@ -100,12 +102,12 @@ while (flag):
     referer = faker.uri()
     useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
     if log_format == "CLF":
-        f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s\n' % (ip,dt,tz,vrb,uri,resp,byt))
+        size -= f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s\n' % (ip,dt,tz,vrb,uri,resp,byt))
     elif log_format == "ELF": 
-        f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s "%s" "%s"\n' % (ip,dt,tz,vrb,uri,resp,byt,referer,useragent))
+        size -= f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s "%s" "%s"\n' % (ip,dt,tz,vrb,uri,resp,byt,referer,useragent))
     f.flush()
 
     log_lines = log_lines - 1
-    flag = False if log_lines == 0 else True
+    flag = False if log_lines == 0 or size < 0 else True
     if args.sleep:
         time.sleep(args.sleep)
