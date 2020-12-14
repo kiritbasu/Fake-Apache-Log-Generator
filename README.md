@@ -12,12 +12,12 @@ It utilizes the excellent [Faker](https://github.com/joke2k/faker/) library to g
 
 Generate a single log line to STDOUT
 ```
-$ python apache-fake-log-gen.py  
+$ python apache-fake-log-gen.py
 ```
 
 Generate 100 log lines into a .log file
 ```
-$ python apache-fake-log-gen.py -n 100 -o LOG 
+$ python apache-fake-log-gen.py -n 100 -o LOG
 ```
 
 Generate 100 log lines into a .gz file at intervals of 10 seconds
@@ -27,10 +27,10 @@ $ python apache-fake-log-gen.py -n 100 -o GZ -s 10
 
 Infinite log file generation (useful for testing File Tail Readers)
 ```
-$ python apache-fake-log-gen.py -n 0 -o LOG 
+$ python apache-fake-log-gen.py -n 0 -o LOG
 ```
 
-Prefix the output filename 
+Prefix the output filename
 ```
 $ python apache-fake-log-gen.py -n 100 -o LOG -p WEB1
 ```
@@ -57,6 +57,18 @@ optional arguments:
                         Sleep this long between lines (in seconds)
 ```
 
+## Usage in Docker
+
+Build the image:
+```
+docker build -t apache-fake-log-gen .
+```
+
+Run the application, and provide application command line arguments as Docker CMD args:
+```
+docker run --rm apache-fake-log-gen -n 10 -s 1
+```
+NOTE: `-o LOG` option does not work in this case.
 
 ## Requirements
 * Python 2.7
