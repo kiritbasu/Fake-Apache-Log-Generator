@@ -60,6 +60,8 @@ parser.add_argument("--max_ip", help="maximum value to before changing IP",type=
 parser.add_argument("--auth_page",help="Authentification page, script will post this page.", default="/auth")
 parser.add_argument("--register_page",help="Authentification page, script will post this page.", default="/register")
 
+parser.add_argument('--datetime',help="The timestamp marking the initiation of log entries, regardless of whether it falls in the past or the future.", default=datetime.datetime.now(), type=lambda s: datetime.datetime.strptime(s, '%Y%m%d-%H%M%S'),)
+
 args = parser.parse_args()
 
 log_lines = args.num_lines
@@ -77,7 +79,7 @@ register_page = args.register_page
 faker = Faker()
 
 timestr = time.strftime("%Y%m%d-%H%M%S")
-otime = datetime.datetime.now()
+otime = args.datetime
 
 outFileName = 'access_log_'+timestr+'.log' if not file_prefix else file_prefix+'_access_log_'+timestr+'.log'
 
@@ -96,7 +98,8 @@ response=["200","404","500","301"]
 
 verb=["GET","POST"]
 
-resources=["/","/register","/articles","/printed-books","/membership","/events","/events/event?id=","/search/tag/show","/auth","/posts/posts/explore","/wp-content/cart.php?id="]
+resources=["/","/register","/articles","/printed-books","/membership","/events","/events/event?id=","/search/tag/","/auth","/posts/posts/explore","/wp-content/cart.php?id="]
+categories = ["Fiction","Non-Fiction","Mystery","Science Fiction","Fantasy","Romance","Historical Fiction","Biography","Autobiography","Self-Help","Travel","Cooking","Health","History","Science","Philosophy","Religion","Art","Music","Sports","Children's","Young Adult","Poetry","Drama","Comics","Graphic Novels","Business","Economics","Psychology","Education","Technology","Reference","Politics","Crime","Horror","Thriller","Adventure","Memoir"]
 
 ualist = [faker.firefox, faker.chrome, faker.safari, faker.internet_explorer, faker.opera]
 
@@ -133,6 +136,8 @@ while (flag):
     uri = random.choice(resources)
     if uri.find("id=")>0:
         uri += str(random.randint(10,3400))
+    if uri.find("/tag/") > 0:
+        uri += random.choice(categories)
     if uri.find(auth_page)>=0 or uri.find(register_page)>=0:
         resp = "POST"
     else:
