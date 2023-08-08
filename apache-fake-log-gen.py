@@ -17,6 +17,13 @@ local = get_localzone()
 # allow writing different patterns (Common Log, Apache Error log etc)
 # log rotation
 
+def normalize_url(url):
+    if url.startswith("http://"):
+        url = "https://" + url[7:]
+    elif not url.startswith("https://"):
+        url = "https://" + url
+
+    return url
 
 class switch(object):
     def __init__(self, value):
@@ -25,8 +32,10 @@ class switch(object):
 
     def __iter__(self):
         """Return the match method once, then stop"""
-        yield self.match
-        raise StopIteration
+        try:
+            yield self.match
+        except StopIteration:
+            return
 
     def match(self, *args):
         """Indicate whether or not to enter a case suite"""
@@ -45,12 +54,25 @@ parser.add_argument("--num", "-n", dest='num_lines', help="Number of lines to ge
 parser.add_argument("--prefix", "-p", dest='file_prefix', help="Prefix the output file name", type=str)
 parser.add_argument("--sleep", "-s", help="Sleep this long between lines (in seconds)", default=0.0, type=float)
 
+parser.add_argument("--domain","-d", help="domain of current website", type=str, default='domain.com')
+parser.add_argument("--min_ip", help="minimum value to before changing IP",type=int,default=1)
+parser.add_argument("--max_ip", help="maximum value to before changing IP",type=int,default=4)
+parser.add_argument("--auth_page",help="Authentification page, script will post this page.", default="/auth")
+parser.add_argument("--register_page",help="Authentification page, script will post this page.", default="/register")
+
 args = parser.parse_args()
 
 log_lines = args.num_lines
 file_prefix = args.file_prefix
 output_type = args.output_type
 log_format = args.log_format
+
+
+domain = normalize_url(args.domain)
+min_ip = args.min_ip
+max_ip = args.max_ip
+auth_page = args.auth_page
+register_page = args.register_page
 
 faker = Faker()
 
@@ -72,33 +94,50 @@ for case in switch(output_type):
 
 response=["200","404","500","301"]
 
-verb=["GET","POST","DELETE","PUT"]
+verb=["GET","POST"]
 
-resources=["/list","/wp-content","/wp-admin","/explore","/search/tag/list","/app/main/posts","/posts/posts/explore","/apps/cart.jsp?appID="]
+resources=["/","/register","/articles","/printed-books","/membership","/events","/events/event?id=","/search/tag/show","/auth","/posts/posts/explore","/wp-content/cart.php?id="]
 
 ualist = [faker.firefox, faker.chrome, faker.safari, faker.internet_explorer, faker.opera]
 
 flag = True
+count=0
+ip=""
+useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
+sameIP = 2
 while (flag):
     if args.sleep:
         increment = datetime.timedelta(seconds=args.sleep)
     else:
         increment = datetime.timedelta(seconds=random.randint(30, 300))
     otime += increment
+    if not ip: 
+        ip = faker.ipv4()
+        useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
+        referer = faker.uri()
+        sameIP = random.randint(min_ip, max_ip)
+        count = 0
+    elif count%sameIP == 0:
+        ip = faker.ipv4()
+        useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
+        referer = faker.uri()
+        sameIP = random.randint(min_ip, max_ip)
+        count = 0
+    else:
+        referer = domain + uri # get last url
 
-    ip = faker.ipv4()
     dt = otime.strftime('%d/%b/%Y:%H:%M:%S')
     tz = datetime.datetime.now(local).strftime('%z')
-    vrb = numpy.random.choice(verb,p=[0.6,0.1,0.1,0.2])
+    vrb = numpy.random.choice(verb,p=[0.8,0.2])
 
     uri = random.choice(resources)
-    if uri.find("apps")>0:
-        uri += str(random.randint(1000,10000))
-
-    resp = numpy.random.choice(response,p=[0.9,0.04,0.02,0.04])
+    if uri.find("id=")>0:
+        uri += str(random.randint(10,3400))
+    if uri.find(auth_page)>=0 or uri.find(register_page)>=0:
+        resp = "POST"
+    else:
+        resp = numpy.random.choice(response,p=[0.9,0.04,0.02,0.04])
     byt = int(random.gauss(5000,50))
-    referer = faker.uri()
-    useragent = numpy.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05] )()
     if log_format == "CLF":
         f.write('%s - - [%s %s] "%s %s HTTP/1.0" %s %s\n' % (ip,dt,tz,vrb,uri,resp,byt))
     elif log_format == "ELF": 
@@ -109,3 +148,4 @@ while (flag):
     flag = False if log_lines == 0 else True
     if args.sleep:
         time.sleep(args.sleep)
+    count+=1
