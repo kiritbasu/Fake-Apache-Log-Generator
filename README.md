@@ -38,23 +38,33 @@ $ python apache-fake-log-gen.py -n 100 -o LOG -p WEB1
 
 Detailed help
 ```
-$ python apache-fake-log-gen.py -h
-usage: apache-fake-log-gen.py [-h] [--output {LOG,GZ,CONSOLE}]
-                              [--num NUM_LINES] [--prefix FILE_PREFIX]
-                              [--sleep SLEEP]
+$ python3 apache-fake-log-gen.py -h
+usage: apache-fake-log-gen.py [-h] [--output {LOG,GZ,CONSOLE}] [--log-format {CLF,ELF}] [--num NUM_LINES]
+                                   [--prefix FILE_PREFIX] [--sleep SLEEP] [--domain DOMAIN] [--min_ip MIN_IP]
+                                   [--max_ip MAX_IP] [--auth_page AUTH_PAGE] [--register_page REGISTER_PAGE]
 
 Fake Apache Log Generator
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --output {LOG,GZ,CONSOLE}, -o {LOG,GZ,CONSOLE}
                         Write to a Log file, a gzip file or to STDOUT
+  --log-format {CLF,ELF}, -l {CLF,ELF}
+                        Log format, Common or Extended Log Format
   --num NUM_LINES, -n NUM_LINES
                         Number of lines to generate (0 for infinite)
   --prefix FILE_PREFIX, -p FILE_PREFIX
                         Prefix the output file name
   --sleep SLEEP, -s SLEEP
                         Sleep this long between lines (in seconds)
+  --domain DOMAIN, -d DOMAIN
+                        domain of current website
+  --min_ip MIN_IP       minimum value to before changing IP
+  --max_ip MAX_IP       maximum value to before changing IP
+  --auth_page AUTH_PAGE
+                        Authentification page, script will post this page.
+  --register_page REGISTER_PAGE
+                        Authentification page, script will post this page.
 ```
 
 
